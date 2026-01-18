@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yılanla Kelime Avı</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+    <div class="oyun-container">
+        <div class="oyun-sol-panel">
+            
+            <div class="oyun-bilgileri">
+                <div class="bilgi-kutusu">
+                    <div class="ust-bilgi-panel">
+                        <div class="seviye-container">
+                            <span class="seviye-label">SEVİYE</span>
+                            <span id="seviyeGostergesi">1</span>
+                        </div>
+                        <div class="skor-container">
+                            <span class="skor-label">SKOR</span>
+                            <span id="skorGostergesi">0 / 10</span>
+                        </div>
+                        <div class="zaman-container">
+                            <span class="zaman-label">SÜRE</span>
+                            <span id="zamanGostergesi">03:00</span>
+                        </div>
+                    </div>
+                    <div class="ilerleme-barı">
+                        <div id="ilerlemeBarı" class="ilerleme-dolu"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="oyun-alanı-container">
+                <canvas id="oyunAlani"></canvas>
+            </div>
+
+            <div id="kelimeGostergesi" class="kelime-göstergesi-modern">
+                <span class="kelime-label">Mevcut Kelime:</span>
+                <span id="kelimeMetni"></span>
+            </div>
+            
+            <div class="buton-paneli">
+                <button id="yeniOyunBtn" class="buton-modern">
+                    <span class="buton-ikon">🎮</span>
+                    Yeni Oyun Başlat
+                </button>
+                <button id="tamEkranBtn" class="buton-modern">
+                    <span class="buton-ikon">📺</span>
+                    Tam Ekran
+                </button>
+                <button id="pauseBtn" class="buton-modern">
+                    <span class="buton-ikon">⏸️</span>
+                    <span class="pause-text">Duraklat</span>
+                </button>
+                <div class="ses-kontrol buton-modern buton-kutu">
+                    <span class="buton-ikon">🎮</span>
+                    <label for="sesToggle">8-bit Ses:</label>
+                    <button id="sesToggle" class="buton-ic">Açık</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="kelime-paneli">
+            <h2>Bulunan Kelimeler</h2>
+            <ul id="bulunanKelimelerListesi">
+            </ul>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+
+            <div class="gamepad-kutu">
+                <div id="gamepadDurum" class="gamepad-durum">Oyun kolu: bağlı değil</div>
+                <div class="gamepad-ipuclari">
+                    <div>Sol çubuk / D‑pad: yön</div>
+                    <div>A (0): Pause</div>
+                    <div>Y (4): Tam Ekran</div>
+                    <div>7 numaralı tuş: Yeni Oyun</div>
+                    <div>START (9) / VIEW (3): Oyun Başlat</div>
+                </div>
+            </div>
+
+</body>
+</html>
