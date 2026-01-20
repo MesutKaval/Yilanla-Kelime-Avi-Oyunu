@@ -32,13 +32,15 @@ const pauseBtn = document.getElementById('pauseBtn');
 const portalIkonlari = {
     merkez: new Image(),
     geri: new Image(),
-    zaman: new Image()
+    zaman: new Image(),
+    duvar: new Image()
 };
 
 // İkonları yükle
 portalIkonlari.merkez.src = 'assets/portal_icons/merkez.png';
 portalIkonlari.geri.src = 'assets/portal_icons/geri.png';
 portalIkonlari.zaman.src = 'assets/portal_icons/zaman.png';
+portalIkonlari.duvar.src = 'assets/portal_icons/duvar.png';
 
 
 // --- Oyun Sabitleri ---
@@ -251,6 +253,7 @@ let geriAlKaresi = null;  // Geri al portalı
 let ekstraSureKaresi = null;  // Zaman portalı
 let kelimeAlimGecmisi = []; // [{harf, x, y}]
 let geriAlKaresiKullanildi = false;  // Geri al portalı bir kez kullanıldı mı?
+let duvarKareleri = []; // [{x, y}] - Ceza duvarları
 
 
 // --- Kelime Listesi ---
@@ -342,6 +345,33 @@ function cizEkstraSureKaresi() {
         ctx.fillRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
         ctx.restore();
     }
+}
+
+// Duvar (Ceza) portallarını çiz
+function duvarKareleriniCiz() {
+    duvarKareleri.forEach(kare => {
+        const x = kare.x * KARE_BOYUTU;
+        const y = kare.y * KARE_BOYUTU;
+
+        if (portalIkonlari.duvar && portalIkonlari.duvar.complete && portalIkonlari.duvar.naturalWidth !== 0) {
+            ctx.drawImage(portalIkonlari.duvar, x, y, KARE_BOYUTU, KARE_BOYUTU);
+        } else {
+            // Fallback: Kırmızı/Gri çizgili duvar
+            ctx.save();
+            ctx.fillStyle = '#424242';
+            ctx.fillRect(x, y, KARE_BOYUTU, KARE_BOYUTU);
+            ctx.strokeStyle = '#ef5350';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.lineTo(x + KARE_BOYUTU, y + KARE_BOYUTU);
+            ctx.moveTo(x + KARE_BOYUTU, y);
+            ctx.lineTo(x, y + KARE_BOYUTU);
+            ctx.stroke();
+            ctx.restore();
+        }
+    });
 }
 
 // --- KELİME LİSTESİ YÜKLEME ---
@@ -630,6 +660,12 @@ function sesKelimeRet() {
     }, 300);
 }
 
+function sesCarpma() {
+    // Çarpma sesi - patlama/gürültü
+    bit8SesEfekti('crash', { frekans: 100, sure: 0.1, volume: 0.2, tip: 'sawtooth' });
+    setTimeout(() => bit8SesEfekti('crash2', { frekans: 50, sure: 0.4, volume: 0.25, tip: 'sawtooth' }), 50);
+}
+
 // Müzik sistemi kaldırıldı - sadece ses efektleri
 
 // --- OYUN YÖNETİMİ ---
@@ -781,6 +817,7 @@ function oyunuBaslat(seviye = 1) {
         kelimeAlimGecmisi = [];
         geriAlKaresi = null;
         ekstraSureKaresi = null;
+        duvarKareleri = []; // Duvarları temizle
         if (mevcutSeviye === 1) {
             geriAlKaresiKullanildi = false;  // Sadece seviye 1'de sıfırla
         }
@@ -922,6 +959,25 @@ function gecersizKelimeyiIsle(kelime, renk) {
         bulunanKelimeler.push({ kelime: kelime, puan: puanKaybi, gecerli: false });
         kelimePaneliniGuncelle();
         guncelleUI();
+
+        // CEZA: Duvar portalları oluştur (Kelime uzunluğu kadar)
+        let olusturulanDuvarSayisi = 0;
+        let deneme = 0;
+        while (olusturulanDuvarSayisi < kelime.length && deneme < 200) {
+            const rx = Math.floor(Math.random() * GRID_BOYUTU);
+            const ry = Math.floor(Math.random() * GRID_BOYUTU);
+
+            // Yılanın kafasına çok yakın olmasın (biraz adalet)
+            const kafayaMesafe = Math.abs(rx - yilan[0].x) + Math.abs(ry - yilan[0].y);
+
+            if (!pozisyonDoluMu(rx, ry) && kafayaMesafe > 3) {
+                duvarKareleri.push({ x: rx, y: ry });
+                olusturulanDuvarSayisi++;
+
+                // Efekt: Duvar oluşma (küçük partikül veya ses olabilir, şimdilik sadece varlık)
+            }
+            deneme++;
+        }
     }
 }
 
@@ -1024,6 +1080,15 @@ function yilaniHareketEttir() {
     }
     if (yilan.slice(1).some(p => p.x === kafa.x && p.y === kafa.y)) {
         oyunuBitir("Kendine Çarptın!"); return false;
+    }
+    // Duvar Portalı (Ceza) çarpışma kontrolü
+    if (duvarKareleri.some(d => d.x === kafa.x && d.y === kafa.y)) {
+        // Çarpma efekti ve ses
+        sesCarpma();
+        carpmaEfekti(kafa.x * KARE_BOYUTU + KARE_BOYUTU / 2, kafa.y * KARE_BOYUTU + KARE_BOYUTU / 2, () => {
+            oyunuBitir("Gizemli Duvara Çarptın!");
+        });
+        return false;
     }
 
     yilan.unshift(kafa);
@@ -1306,6 +1371,9 @@ function tumunuCiz() {
     // Zaman portalı (+30 saniye)
     cizEkstraSureKaresi();
 
+    // Duvar portalları
+    duvarKareleriniCiz();
+
     // Pause durumunda harfleri çizme
     if (!oyunPause) {
         harfler.forEach(h => {
@@ -1431,11 +1499,15 @@ function tumunuCiz() {
 }
 
 // --- Geri Al Karesi Mantığı ---
+// --- Geri Al Karesi Mantığı ---
 function pozisyonDoluMu(x, y) {
-    // Yılan veya mevcut harfler veya onay karesi ile çakışma kontrolü
+    // Yılan, harfler, onay karesi veya portallar ile çakışma kontrolü
     if (yilan && yilan.some(p => p.x === x && p.y === y)) return true;
     if (harfler && harfler.some(h => h.x === x && h.y === y)) return true;
     if (onayKaresi && onayKaresi.x === x && onayKaresi.y === y) return true;
+    if (geriAlKaresi && geriAlKaresi.x === x && geriAlKaresi.y === y) return true;
+    if (ekstraSureKaresi && ekstraSureKaresi.x === x && ekstraSureKaresi.y === y) return true;
+    if (duvarKareleri && duvarKareleri.some(d => d.x === x && d.y === y)) return true;
     return false;
 }
 

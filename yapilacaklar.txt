@@ -1,2 +1,2 @@
-1. portal ekleme yapılacak ve gerekli portallara gerekli ikonlar eklenecek
+1. seviye atla ve x2 portalları eklenecek ve gerekli portallara gerekli ikonlar eklenecek
 2. renk değişimi yapılacak
