@@ -79,14 +79,14 @@ const HIZLAR = {
 
 // --- Renk Paleti (Klasik Tema) ---
 const RENKLER = {
-    onayKaresi: '#00FF66',
-    yilanKafa: '#E74C3C', // Kırmızı
+    onayKaresi: '#00FF66',    // Yeşil
+    yilanKafa: '#E74C3C',     // Kırmızı
     govdeRenkleri: ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF', '#33FFF6'],
     harf: '#FF1493',
     harfStroke: '#00BFFF',
     beyazKare: '#FAFAFA',
     kahverengiKare: '#BDBDBD',
-    arkaplan: '#0f0c29',
+    arkaplan: '#0f0c29',      // Oyun alanı içi koyu lacivert (Klasik)
     panel: '#2c4a70',
     vurgu: '#00d4ff'
 };

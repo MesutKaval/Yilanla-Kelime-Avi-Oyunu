@@ -7,22 +7,22 @@
 
 /* CSS Değişkenleri - Tema Sistemi */
 :root {
-    --arkaplan-renk: #0f1e14;
-    --arkaplan-gradient-1: #0f1e14;
-    --arkaplan-gradient-2: #1e4029;
-    --arkaplan-gradient-3: #1a3324;
-    --panel-renk: rgba(44, 82, 60, 0.9);
-    --vurgu-renk: #00ff88;
-    --vurgu-renk-2: #4caf50;
-    --metin-renk: #e0f7ed;
-    --başarı-renk: #00ff88;
-    --hata-renk: #ff3366;
-    --uyarı-renk: #ffd700;
-    --gölge: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --gölge-hover: 0 12px 48px rgba(0, 255, 136, 0.3);
+    --arkaplan-renk: #1c1917;
+    --arkaplan-gradient-1: #1c1917;
+    --arkaplan-gradient-2: #292524;
+    --arkaplan-gradient-3: #0c0a09;
+    --panel-renk: rgba(28, 25, 23, 0.95);
+    --vurgu-renk: #f59e0b;
+    --vurgu-renk-2: #d97706;
+    --metin-renk: #fef3c7;
+    --başarı-renk: #f59e0b;
+    --hata-renk: #ef4444;
+    --uyarı-renk: #fbbf24;
+    --gölge: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --gölge-hover: 0 12px 48px rgba(245, 158, 11, 0.2);
     --geçiş: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 
@@ -45,8 +45,8 @@ body::before {
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 50%, rgba(76, 175, 80, 0.1) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, rgba(245, 158, 11, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(251, 191, 36, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
     animation: backgroundPulse 10s ease-in-out infinite;
