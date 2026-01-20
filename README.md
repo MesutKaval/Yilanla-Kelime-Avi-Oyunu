@@ -1,5 +1,7 @@
 # 🐍 Yılanla Kelime Avı (Snake Word Hunter)
 
+**[Oyunu Tarayıcıda Oynamak İçin Tıklayın](https://MesutKaval.github.io/Yilanla-Kelime-Avi-Oyunu/)** 🚀
+
 Klasik Yılan (Snake) oyununun heyecanını Kelime Bulmaca zekasıyla birleştiren, modern ve tempolu bir web oyunu.
 
 ![Oyun Ekran Görüntüsü](assets/screenshot.png)
@@ -30,13 +32,17 @@ Oyunda stratejik öneme sahip özel portallar bulunur. İşte ikonları ve göre
 | <img src="assets/portal_icons/zaman.png" width="50"> | **Zaman Portalı** | **6 ve üzeri** harfli kelimelerde çıkar. Aldığınızda süreye **+30 saniye** ekler. |
 | <img src="assets/portal_icons/duvar.png" width="50"> | **Duvar (Ceza) Portalı** | Geçersiz bir kelime onaylarsanız ceza olarak çıkar. Yılan bu duvara çarparsa **OYUN BİTER**. |
 
-## 🚀 Kurulum ve Çalıştırma
+## 🚀 Çalıştırma seçenekleri
 
-Bu proje herhangi bir kurulum gerektirmez. Oynamak için:
+### Seçenek 1: Canlı Oyna (Önerilen)
+Hiçbir şey indirmeden oynamak için şu linke tıklayın:
+👉 **[https://MesutKaval.github.io/Yilanla-Kelime-Avi-Oyunu/](https://MesutKaval.github.io/Yilanla-Kelime-Avi-Oyunu/)**
 
+### Seçenek 2: Bilgisayarında Çalıştır
+İnternet olmadan oynamak isterseniz:
 1.  Bu repoyu indirin.
-2.  `oyunu_baslat.bat` dosyasına çift tıklayın. (Python yüklü olmalıdır)
-3.  Veya doğrudan `index.html` dosyasını tarayıcınızda açın.
+2.  `oyunu_baslat.bat` dosyasına çift tıklayın. (Bilgisayarınızda Python yüklü olmalıdır)
+
 
 ## 🛠️ Teknolojiler
 
