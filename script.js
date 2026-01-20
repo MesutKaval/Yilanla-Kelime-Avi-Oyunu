@@ -1083,11 +1083,7 @@ function yilaniHareketEttir() {
     }
     // Duvar Portalı (Ceza) çarpışma kontrolü
     if (duvarKareleri.some(d => d.x === kafa.x && d.y === kafa.y)) {
-        // Çarpma efekti ve ses
-        sesCarpma();
-        carpmaEfekti(kafa.x * KARE_BOYUTU + KARE_BOYUTU / 2, kafa.y * KARE_BOYUTU + KARE_BOYUTU / 2, () => {
-            oyunuBitir("Gizemli Duvara Çarptın!");
-        });
+        oyunuBitir("Duvara Çarptın!");
         return false;
     }
 
