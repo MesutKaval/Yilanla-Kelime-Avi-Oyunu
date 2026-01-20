@@ -28,24 +28,51 @@ const ilerlemeBarı = document.getElementById('ilerlemeBarı');
 const sesToggle = document.getElementById('sesToggle');
 const pauseBtn = document.getElementById('pauseBtn');
 
+// --- Portal İkonları ---
+const portalIkonlari = {
+    merkez: new Image(),
+    geri: new Image(),
+    zaman: new Image()
+};
+
+// İkonları yükle
+portalIkonlari.merkez.src = 'assets/portal_icons/merkez.png';
+portalIkonlari.geri.src = 'assets/portal_icons/geri.png';
+portalIkonlari.zaman.src = 'assets/portal_icons/zaman.png';
+
+
 // --- Oyun Sabitleri ---
 const GRID_BOYUTU = 23;
 let KARE_BOYUTU = oyunAlani ? (oyunAlani.width / GRID_BOYUTU) : 20;
 
 const SEVIYELER = {
-    1: { hedef: 10, sure: 90 },  // 1.5 dakika
-    2: { hedef: 15, sure: 120 }, // 2 dakika
-    3: { hedef: 20, sure: 150 }  // 2.5 dakika
+    1: { hedef: 4, sure: 60 },   // 4 harf
+    2: { hedef: 6, sure: 75 },   // 6 harf
+    3: { hedef: 8, sure: 90 },   // 8 harf
+    4: { hedef: 10, sure: 105 }, // 10 harf
+    5: { hedef: 12, sure: 120 }, // 12 harf
+    6: { hedef: 14, sure: 135 }, // 14 harf
+    7: { hedef: 16, sure: 150 }, // 16 harf
+    8: { hedef: 18, sure: 165 }, // 18 harf
+    9: { hedef: 20, sure: 180 }, // 20 harf
+    10: { hedef: 22, sure: 200 } // 22 harf
 };
 
 // --- Hız Ayarları ---
 const spmToMs = (spm) => (60 * 1000) / spm;
 
 const HIZLAR = {
-    1: 280,      // Seviye 1 için SPM
-    2: 320,      // Seviye 2 için SPM
-    3: 360,      // Seviye 3 için SPM
-    default: 283 // Diğer seviyeler için varsayılan SPM
+    1: 200,      // Seviye 1 - Yavaş başlangıç
+    2: 220,      // Seviye 2
+    3: 240,      // Seviye 3
+    4: 260,      // Seviye 4
+    5: 280,      // Seviye 5
+    6: 300,      // Seviye 6
+    7: 320,      // Seviye 7
+    8: 340,      // Seviye 8
+    9: 360,      // Seviye 9
+    10: 380,     // Seviye 10 - Maksimum hız!
+    default: 200 // Varsayılan SPM
 };
 
 // --- Renk Paleti (Klasik Tema) ---
@@ -220,6 +247,11 @@ let seviyeTamamlandi = false;  // Seviye tamamlandı, START bekleniyor
 let beklenenSeviye = null;  // Başlatılacak seviye
 let kelimeOnaylaniyorMu = false;  // Kelime onaylama kilidi
 const onayKaresi = { x: 11, y: 11 }; // 23x23 grid'de merkez
+let geriAlKaresi = null;  // Geri al portalı
+let ekstraSureKaresi = null;  // Zaman portalı
+let kelimeAlimGecmisi = []; // [{harf, x, y}]
+let geriAlKaresiKullanildi = false;  // Geri al portalı bir kez kullanıldı mı?
+
 
 // --- Kelime Listesi ---
 let kelimeListesi = new Set(); // Hızlı arama için Set kullanıyoruz
@@ -232,348 +264,90 @@ let parçaciklar = [];
 let animasyonHızı = 1;
 let crashEffectActive = false;
 
-// --- Portal Sistemi ---
-let geriAlKaresi = null; // {x, y} veya null - sarı portal (harf silme portalı)
-let kelimeAlimGecmisi = []; // [{harf, x, y}]
-let ekstraSureKaresi = null; // {x, y} veya null - zaman portalı (+30 saniye)
-
-// Merkez portal için geliştirilmiş vurgu ve animasyon
-function cizOnayKaresiVurgusu() {
-    const onayX = onayKaresi.x * KARE_BOYUTU;
-    const onayY = onayKaresi.y * KARE_BOYUTU;
-    const cx = onayX + KARE_BOYUTU / 2;
-    const cy = onayY + KARE_BOYUTU / 2;
-    const t = Date.now();
-    const pulse = 0.7 + Math.sin(t * 0.01) * 0.3; // daha hızlı ve dinamik nefes
-    const flash = 0.5 + Math.sin(t * 0.02) * 0.5; // yanıp sönen ışık efekti
-    const renk = '#00FF00'; // daha canlı yeşil merkez portal rengi
-
-    ctx.save();
-
-    // Tüm efektleri kare içine kilitle (taşma yok)
-    ctx.beginPath();
-    ctx.rect(onayX, onayY, KARE_BOYUTU, KARE_BOYUTU);
-    ctx.clip();
-
-    // Merkez portal - canlı yeşil çekirdek + yanıp sönen halo
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, KARE_BOYUTU * 0.75);
-    g.addColorStop(0, `rgba(0, 255, 0, ${0.8 + flash * 0.2})`); // daha canlı yeşil merkez
-    g.addColorStop(0.3, `rgba(0, 255, 0, ${0.6 + flash * 0.3})`); // orta daha canlı yeşil
-    g.addColorStop(1, 'rgba(0, 255, 0, 0.1)'); // dış daha canlı yeşil
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = g;
-    ctx.fillRect(onayX, onayY, KARE_BOYUTU, KARE_BOYUTU);
-
-    // Merkez portal kenarlığı - yanıp sönen canlı yeşil
-    ctx.shadowBlur = 25 * pulse * flash;
-    ctx.shadowColor = '#00FF00';
-    ctx.strokeStyle = `rgba(0, 255, 0, ${0.8 + flash * 0.2})`;
-    ctx.lineWidth = 4 * flash;
-    ctx.strokeRect(onayX + 2, onayY + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
-
-    // Merkez portal - animasyonlu kesik çizgi çerçeve
-    ctx.save();
-    const dashLen = Math.max(6, KARE_BOYUTU * 0.14);
-    const gapLen = Math.max(8, KARE_BOYUTU * 0.18);
-    ctx.setLineDash([dashLen, gapLen]);
-    ctx.lineDashOffset = -((t * 0.12) % 1000); // daha hızlı akış
-    ctx.strokeStyle = `rgba(0, 255, 0, ${0.7 + flash * 0.3})`; // daha canlı yeşil
-    ctx.globalAlpha = 0.8;
-    ctx.lineWidth = 2 * flash;
-    ctx.beginPath();
-    ctx.rect(onayX + 3, onayY + 3, KARE_BOYUTU - 6, KARE_BOYUTU - 6);
-    ctx.stroke();
-    ctx.restore();
-
-    // Merkez portal - dinamik tarama efekti
-    const w = KARE_BOYUTU * 0.18;
-    const sweepX = onayX + ((t * 0.25) % (KARE_BOYUTU + w)) - w / 2;
-    const lg = ctx.createLinearGradient(sweepX - w, onayY, sweepX + w, onayY);
-    lg.addColorStop(0, 'rgba(0, 255, 0, 0)');
-    lg.addColorStop(0.5, `rgba(0, 255, 0, ${0.4 + flash * 0.3})`);
-    lg.addColorStop(1, 'rgba(0, 255, 0, 0)');
-    ctx.globalAlpha = 0.6;
-    ctx.fillStyle = lg;
-    ctx.fillRect(onayX, onayY, KARE_BOYUTU, KARE_BOYUTU);
-
-    // Merkez portal - ripple halkaları
-    for (let i = 0; i < 2; i++) {
-        const progress = ((t / 600 + i * 0.5) % 1);
-        const r = (KARE_BOYUTU * 0.15) + progress * (KARE_BOYUTU * 0.35);
-        ctx.beginPath();
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.globalAlpha = 0.35 * (1 - progress) * flash;
-        ctx.lineWidth = 1.8;
-        ctx.strokeStyle = '#00FF00'; // daha canlı yeşil
-        ctx.stroke();
-    }
-
-    // ⭐ Merkez portal - dönen yıldızlar efekti
-    const yildizSayisi = 6;
-    const yildizYaricap = KARE_BOYUTU * 0.35;
-    const donmeHizi = t * 0.001;
-
-    for (let i = 0; i < yildizSayisi; i++) {
-        const angle = (Math.PI * 2 * i / yildizSayisi) + donmeHizi;
-        const sx = cx + Math.cos(angle) * yildizYaricap;
-        const sy = cy + Math.sin(angle) * yildizYaricap;
-        const yildizBoyut = KARE_BOYUTU * 0.08;
-        const parlamaFaz = Math.sin(t * 0.005 + i) * 0.5 + 0.5;
-
-        // Yıldız glow - daha canlı yeşil
-        ctx.save();
-        ctx.shadowBlur = 15 * parlamaFaz * flash;
-        ctx.shadowColor = '#00FF00';
-        ctx.globalAlpha = (0.7 + parlamaFaz * 0.3) * flash;
-
-        // Yıldız şekli (5 kol) - daha canlı yeşil
-        ctx.fillStyle = '#00FF00';
-        ctx.beginPath();
-        for (let j = 0; j < 5; j++) {
-            const a1 = (Math.PI * 2 * j / 5) - Math.PI / 2 + donmeHizi * 2;
-            const a2 = (Math.PI * 2 * (j + 0.5) / 5) - Math.PI / 2 + donmeHizi * 2;
-            const outerX = sx + Math.cos(a1) * yildizBoyut;
-            const outerY = sy + Math.sin(a1) * yildizBoyut;
-            const innerX = sx + Math.cos(a2) * (yildizBoyut * 0.4);
-            const innerY = sy + Math.sin(a2) * (yildizBoyut * 0.4);
-
-            if (j === 0) ctx.moveTo(outerX, outerY);
-            else ctx.lineTo(outerX, outerY);
-            ctx.lineTo(innerX, innerY);
-        }
-        ctx.closePath();
-        ctx.fill();
-
-        // Merkez parlama - beyaz
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(sx, sy, yildizBoyut * 0.25, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-    // 🌊 Merkez portal - enerji dalgası efekti
-    const dalgaSayisi = 3;
-    for (let i = 0; i < dalgaSayisi; i++) {
-        const dalgaProgress = ((t / 1000 + i * 0.33) % 1);
-        const dalgaR = KARE_BOYUTU * 0.1 + dalgaProgress * (KARE_BOYUTU * 0.35);
-        const dalgaAlpha = 0.4 * (1 - dalgaProgress) * flash;
-
-        ctx.save();
-        ctx.globalAlpha = dalgaAlpha;
-        ctx.strokeStyle = '#00FF00'; // daha canlı yeşil
-        ctx.lineWidth = 3;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = '#00FF00';
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, dalgaR, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.restore();
-    }
-
-    // ⚛️ Merkez portal - atom şekli ve dönen elektronlar
-    ctx.save();
-
-    // Atom çekirdeği - siyah
-    const atomCekirdekBoyut = KARE_BOYUTU * 0.08;
-    const atomGradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, atomCekirdekBoyut);
-    atomGradient.addColorStop(0, '#333333');
-    atomGradient.addColorStop(0.5, '#000000');
-    atomGradient.addColorStop(1, '#111111');
-
-    ctx.fillStyle = atomGradient;
-    ctx.shadowBlur = 20 * flash;
-    ctx.shadowColor = '#00FF00';
-    ctx.beginPath();
-    ctx.arc(cx, cy, atomCekirdekBoyut, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Atom yörüngeleri
-    const yorungeSayisi = 3;
-    for (let i = 0; i < yorungeSayisi; i++) {
-        const yorungeYaricap = KARE_BOYUTU * (0.15 + i * 0.08);
-        const yorungeAlpha = 0.3 * (1 - i * 0.2) * flash;
-
-        ctx.strokeStyle = `rgba(0, 255, 0, ${yorungeAlpha})`;
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(cx, cy, yorungeYaricap, 0, Math.PI * 2);
-        ctx.stroke();
-
-        // Dönen elektronlar
-        const elektronSayisi = 2 + i; // Her yörüngede farklı sayıda elektron
-        for (let j = 0; j < elektronSayisi; j++) {
-            const elektronAngle = (t * 0.003 * (i + 1)) + (j * Math.PI * 2 / elektronSayisi);
-            const elektronX = cx + Math.cos(elektronAngle) * yorungeYaricap;
-            const elektronY = cy + Math.sin(elektronAngle) * yorungeYaricap;
-            const elektronBoyut = KARE_BOYUTU * 0.02;
-
-            // Elektron glow
-            ctx.shadowBlur = 15 * flash;
-            ctx.shadowColor = '#00FF00';
-            ctx.fillStyle = '#FFFFFF';
-            ctx.beginPath();
-            ctx.arc(elektronX, elektronY, elektronBoyut, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Elektron çekirdeği
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = '#00FF00';
-            ctx.beginPath();
-            ctx.arc(elektronX, elektronY, elektronBoyut * 0.6, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
-
-    ctx.restore();
-    ctx.restore();
-}
-
-// Sarı portal (harf silme portalı) çiz
+// Geri al portalı ikonunu çiz
 function cizGeriAlKaresi() {
     if (!geriAlKaresi) return;
-    const gx = geriAlKaresi.x * KARE_BOYUTU;
-    const gy = geriAlKaresi.y * KARE_BOYUTU;
-    const cx = gx + KARE_BOYUTU / 2;
-    const cy = gy + KARE_BOYUTU / 2;
-    const t = Date.now();
-    const renk = '#FFD700';
 
-    ctx.save();
-    // Kutu zemini (hafif sarı parıltı)
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, KARE_BOYUTU * 0.7);
-    g.addColorStop(0, renk + 'cc');
-    g.addColorStop(1, renk + '20');
-    ctx.fillStyle = g;
-    ctx.fillRect(gx, gy, KARE_BOYUTU, KARE_BOYUTU);
+    const x = geriAlKaresi.x * KARE_BOYUTU;
+    const y = geriAlKaresi.y * KARE_BOYUTU;
 
-    // Kenarlık ve glow
-    ctx.shadowBlur = 18;
-    ctx.shadowColor = renk;
-    ctx.strokeStyle = renk;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(gx + 2, gy + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+    // İkon yüklendiyse çiz
+    if (portalIkonlari.geri && portalIkonlari.geri.complete && portalIkonlari.geri.naturalWidth !== 0) {
+        ctx.drawImage(portalIkonlari.geri, x, y, KARE_BOYUTU, KARE_BOYUTU);
+    } else {
+        // Fallback
+        ctx.save();
+        ctx.fillStyle = '#ffd700'; // Sarı
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#ffd700';
+        ctx.beginPath();
+        ctx.arc(x + KARE_BOYUTU / 2, y + KARE_BOYUTU / 2, KARE_BOYUTU * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
 
-    // Basit sola yönelmiş ok
-    ctx.translate(cx, cy);
 
-    ctx.strokeStyle = '#000000';
-    ctx.fillStyle = '#000000';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
 
-    const okBoyut = KARE_BOYUTU * 0.25;
+// Merkez portal ikonunu çiz
+function cizOnayKaresiVurgusu() {
+    const x = onayKaresi.x * KARE_BOYUTU;
+    const y = onayKaresi.y * KARE_BOYUTU;
 
-    // Sola yönelmiş ok çiz
-    ctx.beginPath();
+    // İkon yüklendiyse çiz
+    if (portalIkonlari.merkez && portalIkonlari.merkez.complete && portalIkonlari.merkez.naturalWidth !== 0) {
+        ctx.save();
+        // Hafif nefes alma efekti
+        const scale = 1 + Math.sin(Date.now() / 500) * 0.05;
+        const merkezX = x + KARE_BOYUTU / 2;
+        const merkezY = y + KARE_BOYUTU / 2;
 
-    // Ok gövdesi (yatay çizgi)
-    ctx.moveTo(-okBoyut * 0.3, 0);
-    ctx.lineTo(okBoyut * 0.3, 0);
-
-    // Ok başı (sola yönelmiş)
-    ctx.moveTo(-okBoyut * 0.3, 0);
-    ctx.lineTo(-okBoyut * 0.1, -okBoyut * 0.25);
-    ctx.moveTo(-okBoyut * 0.3, 0);
-    ctx.lineTo(-okBoyut * 0.1, okBoyut * 0.25);
-
-    ctx.stroke();
-
-    ctx.restore();
+        ctx.translate(merkezX, merkezY);
+        ctx.scale(scale, scale);
+        ctx.drawImage(portalIkonlari.merkez, -KARE_BOYUTU / 2, -KARE_BOYUTU / 2, KARE_BOYUTU, KARE_BOYUTU);
+        ctx.restore();
+    } else {
+        // Fallback: İkon yoksa eski basit çizim
+        ctx.save();
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = '#00ff88';
+        ctx.strokeStyle = '#00ff88';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+        ctx.restore();
+    }
 }
 
 // Zaman portalı (+30 saniye) çiz
 function cizEkstraSureKaresi() {
     if (!ekstraSureKaresi) return;
-    const gx = ekstraSureKaresi.x * KARE_BOYUTU;
-    const gy = ekstraSureKaresi.y * KARE_BOYUTU;
-    const cx = gx + KARE_BOYUTU / 2;
-    const cy = gy + KARE_BOYUTU / 2;
-    const renk = '#00BFFF';
+    const x = ekstraSureKaresi.x * KARE_BOYUTU;
+    const y = ekstraSureKaresi.y * KARE_BOYUTU;
 
-    ctx.save();
-    // Zemin ve glow
-    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, KARE_BOYUTU * 0.7);
-    g.addColorStop(0, renk + 'cc');
-    g.addColorStop(1, renk + '20');
-    ctx.fillStyle = g;
-    ctx.fillRect(gx, gy, KARE_BOYUTU, KARE_BOYUTU);
+    if (portalIkonlari.zaman && portalIkonlari.zaman.complete && portalIkonlari.zaman.naturalWidth !== 0) {
+        ctx.save();
+        // Yavaş dönme efekti
+        const time = Date.now() / 2000;
+        const cx = x + KARE_BOYUTU / 2;
+        const cy = y + KARE_BOYUTU / 2;
 
-    ctx.shadowBlur = 18;
-    ctx.shadowColor = renk;
-    ctx.strokeStyle = renk;
-    ctx.lineWidth = 3;
-    ctx.strokeRect(gx + 2, gy + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
-
-    // Saat işareti ve animasyonu
-    ctx.translate(cx, cy);
-    const tSaat = Date.now();
-    const saatBoyut = KARE_BOYUTU * 0.25;
-
-    // Saat çerçevesi
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.arc(0, 0, saatBoyut, 0, Math.PI * 2);
-    ctx.stroke();
-
-    // Saat numaraları (12, 3, 6, 9)
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `${Math.floor(KARE_BOYUTU * 0.12)}px 'Segoe UI', Arial, sans-serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
-    // 12
-    ctx.fillText('12', 0, -saatBoyut * 0.7);
-    // 3
-    ctx.fillText('3', saatBoyut * 0.7, 0);
-    // 6
-    ctx.fillText('6', 0, saatBoyut * 0.7);
-    // 9
-    ctx.fillText('9', -saatBoyut * 0.7, 0);
-
-    // Saat akrepleri
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-
-    // Yelkovan (dakika) - dönen
-    const yelkovanAngle = (tSaat * 0.001) % (Math.PI * 2);
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(Math.sin(yelkovanAngle) * saatBoyut * 0.6, -Math.cos(yelkovanAngle) * saatBoyut * 0.6);
-    ctx.stroke();
-
-    // Akrep (saat) - daha yavaş dönen
-    const akrepAngle = (tSaat * 0.0002) % (Math.PI * 2);
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(Math.sin(akrepAngle) * saatBoyut * 0.4, -Math.cos(akrepAngle) * saatBoyut * 0.4);
-    ctx.stroke();
-
-    // Merkez nokta
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(0, 0, 3, 0, Math.PI * 2);
-    ctx.fill();
-
-    // +30 yazısı (saat altında)
-    ctx.fillStyle = '#ffffff';
-    ctx.font = `${Math.floor(KARE_BOYUTU * 0.2)}px 'Segoe UI', Arial, sans-serif`;
-    ctx.fillText('+30', 0, saatBoyut * 1.2);
-
-    ctx.restore();
+        ctx.translate(cx, cy);
+        ctx.rotate(time);
+        ctx.drawImage(portalIkonlari.zaman, -KARE_BOYUTU / 2, -KARE_BOYUTU / 2, KARE_BOYUTU, KARE_BOYUTU);
+        ctx.restore();
+    } else {
+        // Fallback
+        ctx.save();
+        ctx.fillStyle = '#00BFFF';
+        ctx.fillRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+        ctx.restore();
+    }
 }
 
 // --- KELİME LİSTESİ YÜKLEME ---
 async function kelimeListesiniYukle() {
     try {
-        const response = await fetch('turkce_kelime_listesi.txt');
+        const response = await fetch('assets/turkce_kelime_listesi.txt');
 
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -868,11 +642,11 @@ function baslangicEkraniniCiz() {
     const centerX = oyunAlani.width / 2;
     const centerY = oyunAlani.height / 2;
 
-    // Radial gradient arka plan (merkez açık mavi, kenarlar koyu mavi)
+    // Radial gradient arka plan (merkez açık yeşil, kenarlar koyu yeşil)
     const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, oyunAlani.width * 0.7);
-    bgGradient.addColorStop(0, '#2a4365');  // Merkez - orta mavi
-    bgGradient.addColorStop(0.5, '#1a365d'); // Orta - koyu mavi
-    bgGradient.addColorStop(1, '#0f172a');   // Kenar - çok koyu mavi
+    bgGradient.addColorStop(0, '#2d5a3d');  // Merkez - orta yeşil
+    bgGradient.addColorStop(0.5, '#1e4029'); // Orta - koyu yeşil
+    bgGradient.addColorStop(1, '#0f2419');   // Kenar - çok koyu yeşil
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, oyunAlani.width, oyunAlani.height);
 
@@ -1005,6 +779,12 @@ function oyunuBaslat(seviye = 1) {
         parçacıklar = [];
         eklenecekParcaSayisi = 0;
         kelimeAlimGecmisi = [];
+        geriAlKaresi = null;
+        ekstraSureKaresi = null;
+        if (mevcutSeviye === 1) {
+            geriAlKaresiKullanildi = false;  // Sadece seviye 1'de sıfırla
+        }
+
 
         document.body.classList.add('oyun-aktif');
 
@@ -1017,7 +797,7 @@ function oyunuBaslat(seviye = 1) {
         yon = 'SAG';
         harfler = [];
         mevcutKelime = '';
-        skor = 0;
+        skor = 0; // Her seviyede skoru sıfırla
         if (mevcutSeviye === 1) {
             bulunanKelimeler = [];
         }
@@ -1213,7 +993,10 @@ function anaDongu() {
     if (yilaniHareketEttir()) {
         yilanAnimasyonOffset += animasyonHızı * 0.1;
         parçacıklarıGüncelle();
-        tumunuCiz();
+        // Sadece oyun devam ediyorsa çiz (oyun bittiğinde sonEkraniCiz kullanılıyor)
+        if (!oyunBitti) {
+            tumunuCiz();
+        }
     }
     // ------------------------------------
 
@@ -1282,6 +1065,7 @@ function yilaniHareketEttir() {
         if (kullanildi) {
             // Kare tüketildi
             geriAlKaresi = null;
+            geriAlKaresiKullanildi = true;  // Bir daha çıkmasın
 
             // Geri alma sesi
             sesGeriAl();
@@ -1373,9 +1157,14 @@ async function kelimeyiOnayla() {
         // Kelime kabul sesi
         sesKelimeKabul();
 
-        // Ödül: 6+ harfli geçerli kelime sonrası rastgele tek portal (Geri Al veya +30s)
-        if (kelime.length >= 6 && !geriAlKaresi && !ekstraSureKaresi) {
-            (Math.random() < 0.5 ? geriAlKaresiOlustur : ekstraSureKaresiOlustur)();
+        // Portal spawn mantığı
+        // Geri al portalı: 5 harfli kelimede bir kereliğe mahsus
+        if (kelime.length === 5 && !geriAlKaresiKullanildi && !geriAlKaresi) {
+            geriAlKaresiOlustur();
+        }
+        // Zaman portalı: 6+ harfli kelimede (eğer geri al portalı yoksa)
+        else if (kelime.length >= 6 && !geriAlKaresi && !ekstraSureKaresi) {
+            ekstraSureKaresiOlustur();
         }
 
         const seviyeBilgisi = SEVIYELER[mevcutSeviye];
@@ -1387,7 +1176,7 @@ async function kelimeyiOnayla() {
                 sesSeviyeAtlama();
                 seviyeTamamlandi = true;
                 beklenenSeviye = sonrakiSeviye;
-                oyunuBitir(`Seviye ${mevcutSeviye} Tamamlandı!\n\nSTART tuşuna basarak devam edin.`);
+                oyunuBitir(`Seviye ${mevcutSeviye} Tamamlandı!\n\nDiğer seviyeye geçmek için boşluk tuşuna basın.`);
             } else {
                 // Oyun bitirme sesi
                 sesSeviyeAtlama();
@@ -1410,14 +1199,15 @@ function sonEkraniCiz(mesaj) {
     ctx.fillRect(0, 0, oyunAlani.width, oyunAlani.height);
     ctx.fillStyle = 'white';
     ctx.textAlign = 'center';
-    ctx.font = '60px "Segoe UI"';
 
     // Çok satırlı metin desteği
     const satirlar = mesaj.split('\n');
-    const satirYuksekligi = 80;
+    const satirYuksekligi = 55;
     const baslangicY = oyunAlani.height / 2 - (satirlar.length - 1) * satirYuksekligi / 2;
 
     satirlar.forEach((satir, index) => {
+        // İlk satır (başlık) 40px, diğer satırlar (talimat) 28px (%30 daha küçük)
+        ctx.font = index === 0 ? '40px "Segoe UI"' : '28px "Segoe UI"';
         ctx.fillText(satir, oyunAlani.width / 2, baslangicY + index * satirYuksekligi);
     });
 

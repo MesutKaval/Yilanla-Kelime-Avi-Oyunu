@@ -1,0 +1,2 @@
+1. portal ekleme yapılacak ve gerekli portallara gerekli ikonlar eklenecek
+2. renk değişimi yapılacak

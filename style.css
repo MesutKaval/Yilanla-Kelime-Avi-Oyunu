@@ -7,19 +7,19 @@
 
 /* CSS Değişkenleri - Tema Sistemi */
 :root {
-    --arkaplan-renk: #0f0c29;
-    --arkaplan-gradient-1: #0f0c29;
-    --arkaplan-gradient-2: #302b63;
-    --arkaplan-gradient-3: #24243e;
-    --panel-renk: rgba(44, 74, 112, 0.9);
-    --vurgu-renk: #00d4ff;
-    --vurgu-renk-2: #5b86e5;
-    --metin-renk: #e0f2f7;
+    --arkaplan-renk: #0f1e14;
+    --arkaplan-gradient-1: #0f1e14;
+    --arkaplan-gradient-2: #1e4029;
+    --arkaplan-gradient-3: #1a3324;
+    --panel-renk: rgba(44, 82, 60, 0.9);
+    --vurgu-renk: #00ff88;
+    --vurgu-renk-2: #4caf50;
+    --metin-renk: #e0f7ed;
     --başarı-renk: #00ff88;
     --hata-renk: #ff3366;
     --uyarı-renk: #ffd700;
     --gölge: 0 8px 32px rgba(0, 0, 0, 0.4);
-    --gölge-hover: 0 12px 48px rgba(0, 212, 255, 0.3);
+    --gölge-hover: 0 12px 48px rgba(0, 255, 136, 0.3);
     --geçiş: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     --glass-bg: rgba(255, 255, 255, 0.1);
     --glass-border: rgba(255, 255, 255, 0.2);
@@ -44,17 +44,24 @@ body::before {
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-        radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 50%, rgba(91, 134, 229, 0.1) 0%, transparent 50%);
+    background:
+        radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(76, 175, 80, 0.1) 0%, transparent 50%);
     pointer-events: none;
     z-index: 0;
     animation: backgroundPulse 10s ease-in-out infinite;
 }
 
 @keyframes backgroundPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
 }
 
 /* Oyun sırasında scroll'u engelle */
@@ -93,7 +100,8 @@ body:fullscreen .kelime-paneli,
 body:-moz-full-screen .kelime-paneli,
 body:-webkit-full-screen .kelime-paneli,
 body:-ms-fullscreen .kelime-paneli {
-    display: none; /* Tam ekran modunda kelime panelini gizle */
+    display: none;
+    /* Tam ekran modunda kelime panelini gizle */
 }
 
 body:fullscreen #oyunAlani,
@@ -133,7 +141,8 @@ body:-ms-fullscreen #oyunAlani {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    flex: 6; /* Daha fazla alan oyun için */
+    flex: 6;
+    /* Daha fazla alan oyun için */
     min-width: 0;
 }
 
@@ -171,8 +180,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes shimmerEffect {
-    0% { transform: translateX(-100%) rotate(45deg); }
-    100% { transform: translateX(100%) rotate(45deg); }
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    100% {
+        transform: translateX(100%) rotate(45deg);
+    }
 }
 
 .ust-bilgi-panel {
@@ -182,7 +196,9 @@ body:-ms-fullscreen #oyunAlani {
     margin-bottom: 10px;
 }
 
-.seviye-container, .skor-container, .zaman-container {
+.seviye-container,
+.skor-container,
+.zaman-container {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -197,7 +213,9 @@ body:-ms-fullscreen #oyunAlani {
     overflow: hidden;
 }
 
-.seviye-container::before, .skor-container::before, .zaman-container::before {
+.seviye-container::before,
+.skor-container::before,
+.zaman-container::before {
     content: '';
     position: absolute;
     top: 0;
@@ -208,16 +226,22 @@ body:-ms-fullscreen #oyunAlani {
     transition: left 0.5s;
 }
 
-.seviye-container:hover, .skor-container:hover, .zaman-container:hover {
+.seviye-container:hover,
+.skor-container:hover,
+.zaman-container:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
 }
 
-.seviye-container:hover::before, .skor-container:hover::before, .zaman-container:hover::before {
+.seviye-container:hover::before,
+.skor-container:hover::before,
+.zaman-container:hover::before {
     left: 100%;
 }
 
-.seviye-label, .skor-label, .zaman-label {
+.seviye-label,
+.skor-label,
+.zaman-label {
     font-size: 9px;
     font-weight: 700;
     color: var(--vurgu-renk);
@@ -226,7 +250,9 @@ body:-ms-fullscreen #oyunAlani {
     text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
 }
 
-#seviyeGostergesi, #skorGostergesi, #zamanGostergesi {
+#seviyeGostergesi,
+#skorGostergesi,
+#zamanGostergesi {
     font-size: 18px;
     font-weight: 800;
     background: linear-gradient(135deg, #ffd700, #ffed4e);
@@ -238,8 +264,15 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes textGlow {
-    0%, 100% { filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.5)); }
-    50% { filter: drop-shadow(0 2px 15px rgba(255, 215, 0, 0.8)); }
+
+    0%,
+    100% {
+        filter: drop-shadow(0 2px 8px rgba(255, 215, 0, 0.5));
+    }
+
+    50% {
+        filter: drop-shadow(0 2px 15px rgba(255, 215, 0, 0.8));
+    }
 }
 
 .ilerleme-barı {
@@ -266,8 +299,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes progressGradient {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 200% 50%; }
+    0% {
+        background-position: 0% 50%;
+    }
+
+    100% {
+        background-position: 200% 50%;
+    }
 }
 
 .ilerleme-dolu::after {
@@ -282,8 +320,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes shimmer {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 /* Kelime Göstergesi */
@@ -318,8 +361,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes scanLine {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    0% {
+        transform: translateX(-100%);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .kelime-label {
@@ -350,8 +398,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes gradientShift {
-    0% { background-position: 0% center; }
-    100% { background-position: 200% center; }
+    0% {
+        background-position: 0% center;
+    }
+
+    100% {
+        background-position: 200% center;
+    }
 }
 
 .kelime-göstergesi-modern.invalid {
@@ -361,9 +414,26 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-    20%, 40%, 60%, 80% { transform: translateX(5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
 }
 
 /* Oyun Alanı */
@@ -382,8 +452,17 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes borderPulse {
-    0%, 100% { border-color: var(--vurgu-renk); box-shadow: var(--gölge), 0 0 40px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.3); }
-    50% { border-color: var(--vurgu-renk-2); box-shadow: var(--gölge), 0 0 60px rgba(91, 134, 229, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.3); }
+
+    0%,
+    100% {
+        border-color: var(--vurgu-renk);
+        box-shadow: var(--gölge), 0 0 40px rgba(0, 212, 255, 0.3), inset 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    50% {
+        border-color: var(--vurgu-renk-2);
+        box-shadow: var(--gölge), 0 0 60px rgba(91, 134, 229, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.3);
+    }
 }
 
 #oyunAlani {
@@ -392,7 +471,8 @@ body:-ms-fullscreen #oyunAlani {
     transition: var(--geçiş);
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain; /* Maintain aspect ratio */
+    object-fit: contain;
+    /* Maintain aspect ratio */
 }
 
 
@@ -403,7 +483,8 @@ body:-ms-fullscreen #oyunAlani {
     gap: 12px;
     flex-wrap: wrap;
     justify-content: center;
-    align-items: center; /* Vertically align items */
+    align-items: center;
+    /* Vertically align items */
 }
 
 /* Tema ve Müzik panellerini butonlarla hizala */
@@ -430,7 +511,7 @@ body:-ms-fullscreen #oyunAlani {
 /* Müzik kutusu içindeki toggle butonunu sadeleştir */
 .buton-ic {
     background: transparent;
-    border: 2px solid rgba(255,255,255,0.2);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     color: var(--metin-renk);
     padding: 6px 10px;
@@ -473,7 +554,8 @@ body:-ms-fullscreen #oyunAlani {
     background: rgba(255, 255, 255, 0.3);
     transform: translate(-50%, -50%);
     transition: width 0.6s, height 0.6s;
-    pointer-events: none; /* overlay tıklamaları engellemesin */
+    pointer-events: none;
+    /* overlay tıklamaları engellemesin */
 }
 
 .buton-modern:hover::before {
@@ -498,8 +580,15 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes iconBounce {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-3px) scale(1.1); }
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-3px) scale(1.1);
+    }
 }
 
 /* Kelime Paneli */
@@ -541,8 +630,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes borderRotate {
-    0% { filter: hue-rotate(0deg); }
-    100% { filter: hue-rotate(360deg); }
+    0% {
+        filter: hue-rotate(0deg);
+    }
+
+    100% {
+        filter: hue-rotate(360deg);
+    }
 }
 
 .kelime-paneli h2 {
@@ -575,8 +669,17 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes underlineGlow {
-    0%, 100% { opacity: 0.5; width: 60%; }
-    50% { opacity: 1; width: 80%; }
+
+    0%,
+    100% {
+        opacity: 0.5;
+        width: 60%;
+    }
+
+    50% {
+        opacity: 1;
+        width: 80%;
+    }
 }
 
 #bulunanKelimelerListesi {
@@ -647,9 +750,11 @@ body:-ms-fullscreen #oyunAlani {
         opacity: 0;
         transform: translateX(-30px) scale(0.8);
     }
+
     60% {
         transform: translateX(5px) scale(1.05);
     }
+
     100% {
         opacity: 1;
         transform: translateX(0) scale(1);
@@ -675,8 +780,15 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes scorePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 #bulunanKelimelerListesi li.gecersiz {
@@ -691,15 +803,19 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 /* Responsive Tasarım */
-@media (max-width: 900px) { /* Adjusted breakpoint */
+@media (max-width: 900px) {
+
+    /* Adjusted breakpoint */
     .oyun-container {
         flex-direction: column;
-        height: auto; /* Allow height to adjust */
+        height: auto;
+        /* Allow height to adjust */
     }
 
     .kelime-paneli {
         width: 100%;
-        max-height: 300px; /* Limit height on small screens */
+        max-height: 300px;
+        /* Limit height on small screens */
     }
 
     .oyun-sol-panel {
@@ -713,25 +829,25 @@ body:-ms-fullscreen #oyunAlani {
         width: 100%;
         padding: 0 10px;
     }
-    
+
     .oyun-bilgileri,
     .kelime-göstergesi-modern,
     .kelime-paneli {
         width: 100%;
         max-width: 100%;
     }
-    
+
     #oyunAlani {
         width: 100%;
         height: auto;
         max-width: 100%;
     }
-    
+
     .buton-paneli {
         flex-direction: column;
         width: 100%;
     }
-    
+
     .buton-modern {
         width: 100%;
         justify-content: center;
@@ -740,13 +856,27 @@ body:-ms-fullscreen #oyunAlani {
 
 /* Özel Animasyonlar */
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 @keyframes glow {
-    0%, 100% { box-shadow: 0 0 20px rgba(79, 195, 247, 0.5); }
-    50% { box-shadow: 0 0 30px rgba(79, 195, 247, 0.8); }
+
+    0%,
+    100% {
+        box-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
+    }
+
+    50% {
+        box-shadow: 0 0 30px rgba(79, 195, 247, 0.8);
+    }
 }
 
 /* Geçiş Efektleri */
@@ -755,8 +885,15 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* 8-bit Ses Kontrolü */
@@ -786,48 +923,60 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes 8bitScan {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
 }
+
 .ses-range-kutu {
     display: flex;
     align-items: center;
     gap: 8px;
 }
+
 .ses-range-kutu label {
     font-weight: 700;
     font-size: 12px;
     color: var(--vurgu-renk);
 }
+
 #muzikSesRange {
     appearance: none;
     width: 160px;
     height: 6px;
     border-radius: 6px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     outline: none;
 }
+
 #muzikSesRange::-webkit-slider-thumb {
     appearance: none;
     width: 18px;
     height: 18px;
-    border-radius: 4px; /* 8-bit tarzı kare */
+    border-radius: 4px;
+    /* 8-bit tarzı kare */
     background: var(--vurgu-renk);
     cursor: pointer;
-    box-shadow: 0 0 8px rgba(0,212,255,0.6), inset 0 0 4px rgba(255,255,255,0.3);
+    box-shadow: 0 0 8px rgba(0, 212, 255, 0.6), inset 0 0 4px rgba(255, 255, 255, 0.3);
     border: 2px solid #ffffff;
 }
+
 #muzikSesRange::-moz-range-thumb {
     width: 18px;
     height: 18px;
-    border-radius: 4px; /* 8-bit tarzı kare */
+    border-radius: 4px;
+    /* 8-bit tarzı kare */
     background: var(--vurgu-renk);
     cursor: pointer;
     border: 2px solid #ffffff;
 }
 
 /* Gamepad kutusu */
-.gamepad-kutu{
+.gamepad-kutu {
     margin-top: 12px;
     padding: 12px;
     border-radius: 14px;
@@ -843,14 +992,15 @@ body:-ms-fullscreen #oyunAlani {
     box-shadow: 0 4px 15px rgba(0, 212, 255, 0.2);
 }
 
-.gamepad-durum{
+.gamepad-durum {
     font-weight: 700;
     margin-bottom: 8px;
     color: var(--vurgu-renk);
     font-size: 0.95rem;
     letter-spacing: 0.5px;
 }
-.gamepad-ipuclari{
+
+.gamepad-ipuclari {
     font-size: 0.85rem;
     opacity: 0.9;
     display: grid;
@@ -898,8 +1048,13 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes internetsizSweep {
-    0% { left: -100%; }
-    100% { left: 100%; }
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
 }
 
 .internetsiz-icon {
@@ -908,8 +1063,15 @@ body:-ms-fullscreen #oyunAlani {
 }
 
 @keyframes iconPulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
 }
 
 .internetsiz-bilgi:hover {
