@@ -27,6 +27,7 @@ const zamanGostergesi = document.getElementById('zamanGostergesi');
 const ilerlemeBarı = document.getElementById('ilerlemeBarı');
 const sesToggle = document.getElementById('sesToggle');
 const pauseBtn = document.getElementById('pauseBtn');
+const temaSelect = document.getElementById('temaSelect'); // Tema seçici (varsa)
 
 // --- Portal İkonları ---
 const portalIkonlari = {
@@ -79,7 +80,7 @@ const HIZLAR = {
 
 // --- Renk Paleti (Klasik Tema) ---
 const RENKLER = {
-    onayKaresi: '#00FF66',    // Yeşil
+    onayKaresi: '#fbb6ce',    // Pastel Pembe
     yilanKafa: '#E74C3C',     // Kırmızı
     govdeRenkleri: ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#A133FF', '#33FFF6'],
     harf: '#FF1493',
@@ -164,7 +165,7 @@ class Parçacık {
 }
 
 function parçacıkEkle(x, y, sayı = 20) {
-    const renkler = [getTemaRengi('vurgu'), getTemaRengi('yilanKafa'), '#ffd700', '#00ff88', '#ff3366'];
+    const renkler = [getTemaRengi('vurgu'), getTemaRengi('yilanKafa'), '#ffd700', '#c4b5fd', '#ff3366'];
     for (let i = 0; i < sayı; i++) {
         const renk = renkler[Math.floor(Math.random() * renkler.length)];
         parçacıklar.push(new Parçacık(x, y, renk, 3));
@@ -194,23 +195,32 @@ function canvasBoyutunuAyarla() {
     const tamEkran = document.fullscreenElement !== null;
 
     if (tamEkran) {
+        // Tam ekranda maksimum kare boyutu - ekranın %98'ini kullan
         const ekranGenislik = window.innerWidth;
         const ekranYukseklik = window.innerHeight;
-        const kareBoyut = Math.floor(Math.min(ekranGenislik / GRID_BOYUTU, ekranYukseklik / GRID_BOYUTU));
+        const kullanilabilirGenislik = ekranGenislik * 0.98;
+        const kullanilabilirYukseklik = ekranYukseklik * 0.98;
+        const enKucukBoyut = Math.min(kullanilabilirGenislik, kullanilabilirYukseklik);
+        const kareBoyut = Math.floor(enKucukBoyut / GRID_BOYUTU);
         oyunAlani.width = kareBoyut * GRID_BOYUTU;
         oyunAlani.height = kareBoyut * GRID_BOYUTU;
         KARE_BOYUTU = kareBoyut;
     } else {
         const container = oyunAlani.parentElement;
         if (container) {
-            const containerBoyut = Math.min(container.clientWidth, container.clientHeight) - 6; // -6 for border
+            // Normal modda container'ın mümkün olan en büyük alanını kullan
+            const containerGenislik = container.clientWidth - 10; // border için
+            const containerYukseklik = container.clientHeight - 10;
+            // Her iki boyutu da kullan, kare şeklini koru
+            const containerBoyut = Math.min(containerGenislik, containerYukseklik);
+            // Canvas boyutunu container'a göre ayarla
             oyunAlani.width = containerBoyut;
             oyunAlani.height = containerBoyut;
             KARE_BOYUTU = oyunAlani.width / GRID_BOYUTU;
         } else {
-            // Fallback: default size
-            oyunAlani.width = 460;
-            oyunAlani.height = 460;
+            // Fallback: default size - çok daha büyük
+            oyunAlani.width = 920;
+            oyunAlani.height = 920;
             KARE_BOYUTU = oyunAlani.width / GRID_BOYUTU;
         }
     }
@@ -313,8 +323,8 @@ function cizOnayKaresiVurgusu() {
         // Fallback: İkon yoksa eski basit çizim
         ctx.save();
         ctx.shadowBlur = 20;
-        ctx.shadowColor = '#00ff88';
-        ctx.strokeStyle = '#00ff88';
+        ctx.shadowColor = '#fbb6ce';
+        ctx.strokeStyle = '#fbb6ce';
         ctx.lineWidth = 2;
         ctx.strokeRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
         ctx.restore();
@@ -678,11 +688,11 @@ function baslangicEkraniniCiz() {
     const centerX = oyunAlani.width / 2;
     const centerY = oyunAlani.height / 2;
 
-    // Radial gradient arka plan (merkez açık yeşil, kenarlar koyu yeşil)
+    // Radial gradient arka plan (merkez açık mor, kenarlar koyu mor)
     const bgGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, oyunAlani.width * 0.7);
-    bgGradient.addColorStop(0, '#2d5a3d');  // Merkez - orta yeşil
-    bgGradient.addColorStop(0.5, '#1e4029'); // Orta - koyu yeşil
-    bgGradient.addColorStop(1, '#0f2419');   // Kenar - çok koyu yeşil
+    bgGradient.addColorStop(0, '#3d2d5a');  // Merkez - orta mor
+    bgGradient.addColorStop(0.5, '#291e40'); // Orta - koyu mor
+    bgGradient.addColorStop(1, '#190f24');   // Kenar - çok koyu mor
     ctx.fillStyle = bgGradient;
     ctx.fillRect(0, 0, oyunAlani.width, oyunAlani.height);
 
@@ -1618,6 +1628,12 @@ function tamEkranYap() {
     }
 }
 
+// Tema değiştirme fonksiyonu (basit)
+function temayıDeğiştir(tema) {
+    // Tema sistemi opsiyonel - şimdilik boş bırakıyoruz
+    console.log('Tema:', tema);
+}
+
 // Pause fonksiyonu
 function oyunuPause() {
     if (!oyunAktif || oyunBitti) return;
@@ -1743,7 +1759,7 @@ if (sesToggle) {
         sesAktif = !sesAktif;
         sesToggle.textContent = sesAktif ? 'Açık' : 'Kapalı';
         sesToggle.style.background = sesAktif ? 'rgba(0, 255, 136, 0.2)' : 'rgba(244, 67, 54, 0.2)';
-        sesToggle.style.borderColor = sesAktif ? '#00ff88' : '#f44336';
+        sesToggle.style.borderColor = sesAktif ? '#c4b5fd' : '#f44336';
     });
 }
 
