@@ -1,4 +1,3 @@
 1. seviye atla ve x2 portalları eklenecek ve gerekli portallara gerekli ikonlar eklenecek
 2. renk değişimi yapılacak
 3. şapkalı a harfi dahil olacak şekilde düzenleme yapılacak
-4. oyun alanı büyütülmeli
