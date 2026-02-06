@@ -257,6 +257,7 @@ let oyunAktif = false;
 let oyunPause = false;  // Pause durumu
 let seviyeTamamlandi = false;  // Seviye tamamlandı, START bekleniyor
 let beklenenSeviye = null;  // Başlatılacak seviye
+let tekrarSeviye = null;  // Yanınca aynı seviyeden devam için
 let kelimeOnaylaniyorMu = false;  // Kelime onaylama kilidi
 const onayKaresi = { x: 11, y: 11 }; // 23x23 grid'de merkez
 let geriAlKaresi = null;  // Geri al portalı
@@ -904,6 +905,14 @@ function oyunuBitir(mesaj) {
     // Oyun bitirme sesi
     if (mesaj.includes("Çarptın") || mesaj.includes("Süre Doldu")) {
         sesOyunBitti();
+    }
+
+    // Yanma/süre dolması durumunda aynı seviyeden devam seçeneği
+    if (mesaj.includes("Çarptın") || mesaj.includes("Süre Doldu")) {
+        tekrarSeviye = mevcutSeviye;
+        mesaj += `\n\nSeviye ${mevcutSeviye}'den devam etmek için boşluk tuşuna basın.`;
+    } else {
+        tekrarSeviye = null;
     }
 
     // Çarpma efektini duvara/kendine çarpışta uygula; diğer durumlarda direkt ekranı göster
@@ -1726,6 +1735,11 @@ document.addEventListener('keydown', (event) => {
                 oyunuBaslat(beklenenSeviye);
                 seviyeTamamlandi = false;
                 beklenenSeviye = null;
+            } else if (tekrarSeviye) {
+                // Yanınca aynı seviyeden devam
+                const seviye = tekrarSeviye;
+                tekrarSeviye = null;
+                oyunuBaslat(seviye);
             } else {
                 // Normal oyun başlat
                 oyunuBaslat();
