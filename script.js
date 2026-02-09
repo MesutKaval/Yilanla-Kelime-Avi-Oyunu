@@ -34,7 +34,9 @@ const portalIkonlari = {
     merkez: new Image(),
     geri: new Image(),
     zaman: new Image(),
-    duvar: new Image()
+    duvar: new Image(),
+    x2: new Image(),
+    levelSkip: new Image()
 };
 
 // İkonları yükle
@@ -42,6 +44,8 @@ portalIkonlari.merkez.src = 'assets/portal_icons/merkez.png';
 portalIkonlari.geri.src = 'assets/portal_icons/geri.png';
 portalIkonlari.zaman.src = 'assets/portal_icons/zaman.png';
 portalIkonlari.duvar.src = 'assets/portal_icons/duvar.png';
+portalIkonlari.x2.src = 'assets/portal_icons/x2.png';
+portalIkonlari.levelSkip.src = 'assets/portal_icons/level_skip.png';
 
 
 // --- Oyun Sabitleri ---
@@ -262,8 +266,9 @@ let kelimeOnaylaniyorMu = false;  // Kelime onaylama kilidi
 const onayKaresi = { x: 11, y: 11 }; // 23x23 grid'de merkez
 let geriAlKaresi = null;  // Geri al portalı
 let ekstraSureKaresi = null;  // Zaman portalı
+let x2Karesi = null;  // x2 puan portalı
+let levelSkipKaresi = null;  // Seviye atlama portalı
 let kelimeAlimGecmisi = []; // [{harf, x, y}]
-let geriAlKaresiKullanildi = false;  // Geri al portalı bir kez kullanıldı mı?
 let duvarKareleri = []; // [{x, y}] - Ceza duvarları
 
 
@@ -287,7 +292,16 @@ function cizGeriAlKaresi() {
 
     // İkon yüklendiyse çiz
     if (portalIkonlari.geri && portalIkonlari.geri.complete && portalIkonlari.geri.naturalWidth !== 0) {
-        ctx.drawImage(portalIkonlari.geri, x, y, KARE_BOYUTU, KARE_BOYUTU);
+        ctx.save();
+        // Hafif nefes alma efekti
+        const scale = 1 + Math.sin(Date.now() / 500) * 0.05;
+        const cx = x + KARE_BOYUTU / 2;
+        const cy = y + KARE_BOYUTU / 2;
+
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.drawImage(portalIkonlari.geri, -KARE_BOYUTU / 2, -KARE_BOYUTU / 2, KARE_BOYUTU, KARE_BOYUTU);
+        ctx.restore();
     } else {
         // Fallback
         ctx.save();
@@ -340,13 +354,13 @@ function cizEkstraSureKaresi() {
 
     if (portalIkonlari.zaman && portalIkonlari.zaman.complete && portalIkonlari.zaman.naturalWidth !== 0) {
         ctx.save();
-        // Yavaş dönme efekti
-        const time = Date.now() / 2000;
+        // Hafif nefes alma efekti (dönme yok, kareye tam oturur)
+        const scale = 1 + Math.sin(Date.now() / 500) * 0.05;
         const cx = x + KARE_BOYUTU / 2;
         const cy = y + KARE_BOYUTU / 2;
 
         ctx.translate(cx, cy);
-        ctx.rotate(time);
+        ctx.scale(scale, scale);
         ctx.drawImage(portalIkonlari.zaman, -KARE_BOYUTU / 2, -KARE_BOYUTU / 2, KARE_BOYUTU, KARE_BOYUTU);
         ctx.restore();
     } else {
@@ -354,6 +368,68 @@ function cizEkstraSureKaresi() {
         ctx.save();
         ctx.fillStyle = '#00BFFF';
         ctx.fillRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+        ctx.restore();
+    }
+}
+
+// x2 Puan portalını çiz
+function cizX2Karesi() {
+    if (!x2Karesi) return;
+    const x = x2Karesi.x * KARE_BOYUTU;
+    const y = x2Karesi.y * KARE_BOYUTU;
+
+    if (portalIkonlari.x2 && portalIkonlari.x2.complete && portalIkonlari.x2.naturalWidth !== 0) {
+        ctx.save();
+        // Hafif nefes alma efekti
+        const scale = 1 + Math.sin(Date.now() / 500) * 0.05;
+        const cx = x + KARE_BOYUTU / 2;
+        const cy = y + KARE_BOYUTU / 2;
+
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.drawImage(portalIkonlari.x2, -KARE_BOYUTU / 2, -KARE_BOYUTU / 2, KARE_BOYUTU, KARE_BOYUTU);
+        ctx.restore();
+    } else {
+        // Fallback
+        ctx.save();
+        ctx.fillStyle = '#FF4500';
+        ctx.fillRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold ' + (KARE_BOYUTU * 0.5) + 'px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('x2', x + KARE_BOYUTU / 2, y + KARE_BOYUTU / 2);
+        ctx.restore();
+    }
+}
+
+// Seviye atlama portalını çiz
+function cizLevelSkipKaresi() {
+    if (!levelSkipKaresi) return;
+    const x = levelSkipKaresi.x * KARE_BOYUTU;
+    const y = levelSkipKaresi.y * KARE_BOYUTU;
+
+    if (portalIkonlari.levelSkip && portalIkonlari.levelSkip.complete && portalIkonlari.levelSkip.naturalWidth !== 0) {
+        ctx.save();
+        // Hafif nefes alma efekti
+        const scale = 1 + Math.sin(Date.now() / 500) * 0.05;
+        const cx = x + KARE_BOYUTU / 2;
+        const cy = y + KARE_BOYUTU / 2;
+
+        ctx.translate(cx, cy);
+        ctx.scale(scale, scale);
+        ctx.drawImage(portalIkonlari.levelSkip, -KARE_BOYUTU / 2, -KARE_BOYUTU / 2, KARE_BOYUTU, KARE_BOYUTU);
+        ctx.restore();
+    } else {
+        // Fallback
+        ctx.save();
+        ctx.fillStyle = '#7B2FF7';
+        ctx.fillRect(x + 2, y + 2, KARE_BOYUTU - 4, KARE_BOYUTU - 4);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold ' + (KARE_BOYUTU * 0.35) + 'px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('SKIP', x + KARE_BOYUTU / 2, y + KARE_BOYUTU / 2);
         ctx.restore();
     }
 }
@@ -826,13 +902,15 @@ function oyunuBaslat(seviye = 1) {
         parçacıklar = [];
         eklenecekParcaSayisi = 0;
         kelimeAlimGecmisi = [];
-        geriAlKaresi = null;
-        ekstraSureKaresi = null;
         duvarKareleri = []; // Duvarları temizle
-        if (mevcutSeviye === 1) {
-            geriAlKaresiKullanildi = false;  // Sadece seviye 1'de sıfırla
-        }
 
+        // Portallar: seviye 1'de sıfırla, sonraki seviyelerde koru ve yeni pozisyona taşı
+        if (mevcutSeviye === 1) {
+            geriAlKaresi = null;
+            ekstraSureKaresi = null;
+            x2Karesi = null;
+            levelSkipKaresi = null;
+        }
 
         document.body.classList.add('oyun-aktif');
 
@@ -853,6 +931,20 @@ function oyunuBaslat(seviye = 1) {
         guncelleUI();
         kelimePaneliniGuncelle();
         harfleriOlustur();
+
+        // Portalları yeni seviyeye taşı (harfler oluştuktan sonra, çakışmasın diye)
+        if (geriAlKaresi) {
+            geriAlKaresiOlustur(); // Yeni boş pozisyona taşır
+        }
+        if (ekstraSureKaresi) {
+            ekstraSureKaresiOlustur(); // Yeni boş pozisyona taşır
+        }
+        if (x2Karesi) {
+            x2KaresiOlustur(); // Yeni boş pozisyona taşır
+        }
+        if (levelSkipKaresi) {
+            levelSkipKaresiOlustur(); // Yeni boş pozisyona taşır
+        }
         anaDongu();
 
         zamanlayiciId = setInterval(zamanlayiciyiGuncelle, 1000);
@@ -1043,7 +1135,9 @@ function yeniHarfYarat(unluMu, engelliSatir = null, engelliSutun = null) {
         (engelliSatir !== null && yeniPozisyon.y === engelliSatir) ||
         (engelliSutun !== null && yeniPozisyon.x === engelliSutun) ||
         (geriAlKaresi && yeniPozisyon.x === geriAlKaresi.x && yeniPozisyon.y === geriAlKaresi.y) ||
-        (ekstraSureKaresi && yeniPozisyon.x === ekstraSureKaresi.x && yeniPozisyon.y === ekstraSureKaresi.y)
+        (ekstraSureKaresi && yeniPozisyon.x === ekstraSureKaresi.x && yeniPozisyon.y === ekstraSureKaresi.y) ||
+        (x2Karesi && yeniPozisyon.x === x2Karesi.x && yeniPozisyon.y === x2Karesi.y) ||
+        (levelSkipKaresi && yeniPozisyon.x === levelSkipKaresi.x && yeniPozisyon.y === levelSkipKaresi.y)
     );
 
     harfler.push({ ...yeniPozisyon, harf: harf });
@@ -1136,6 +1230,32 @@ function yilaniHareketEttir() {
         kelimeyiOnayla();
     }
 
+    // x2 Portalı çarpışma kontrolü (2 katı puan ile kelime onaylama)
+    if (x2Karesi && kafa.x === x2Karesi.x && kafa.y === x2Karesi.y && !kelimeOnaylaniyorMu) {
+        kelimeyiOnayla(2);
+    }
+
+    // Level Skip portalı çarpışma kontrolü (direkt seviye atlama)
+    if (levelSkipKaresi && kafa.x === levelSkipKaresi.x && kafa.y === levelSkipKaresi.y) {
+        const gx = (levelSkipKaresi.x * KARE_BOYUTU) + KARE_BOYUTU / 2;
+        const gy = (levelSkipKaresi.y * KARE_BOYUTU) + KARE_BOYUTU / 2;
+        parçacıkEkle(gx, gy, 30);
+        levelSkipKaresi = null;
+
+        const sonrakiSeviye = mevcutSeviye + 1;
+        if (SEVIYELER[sonrakiSeviye]) {
+            clearInterval(zamanlayiciId);
+            sesSeviyeAtlama();
+            seviyeTamamlandi = true;
+            beklenenSeviye = sonrakiSeviye;
+            oyunuBitir(`Seviye ${mevcutSeviye} Atlandı!\n\nDiğer seviyeye geçmek için boşluk tuşuna basın.`);
+        } else {
+            clearInterval(zamanlayiciId);
+            sesSeviyeAtlama();
+            oyunuBitir("Tebrikler, Oyunu Bitirdin!");
+        }
+    }
+
     // Yılan hareket sesi - her adımda kısık pib
     sesAdim();
 
@@ -1145,7 +1265,6 @@ function yilaniHareketEttir() {
         if (kullanildi) {
             // Kare tüketildi
             geriAlKaresi = null;
-            geriAlKaresiKullanildi = true;  // Bir daha çıkmasın
 
             // Geri alma sesi
             sesGeriAl();
@@ -1175,7 +1294,7 @@ function yilaniHareketEttir() {
     return true;
 }
 
-async function kelimeyiOnayla() {
+async function kelimeyiOnayla(carpan = 1) {
     if (kelimeOnaylaniyorMu) return;
     kelimeOnaylaniyorMu = true;
 
@@ -1218,9 +1337,17 @@ async function kelimeyiOnayla() {
     console.log(`Kelime: "${kelime}" - Geçerli: ${kelimeGecerli}`); // Debug için
 
     if (kelimeGecerli) {
-        const puan = kelime.length;
+        const puan = kelime.length * carpan;
         skor += puan;
         bulunanKelimeler.push({ kelime: kelime, puan: puan, gecerli: true });
+
+        // x2 portalı kullanıldıysa tüket
+        if (carpan > 1 && x2Karesi) {
+            const gx = (x2Karesi.x * KARE_BOYUTU) + KARE_BOYUTU / 2;
+            const gy = (x2Karesi.y * KARE_BOYUTU) + KARE_BOYUTU / 2;
+            parçacıkEkle(gx, gy, 30);
+            x2Karesi = null;
+        }
 
         eklenecekParcaSayisi += puan;
 
@@ -1238,13 +1365,21 @@ async function kelimeyiOnayla() {
         sesKelimeKabul();
 
         // Portal spawn mantığı
-        // Geri al portalı: 5 harfli kelimede bir kereliğe mahsus
-        if (kelime.length === 5 && !geriAlKaresiKullanildi && !geriAlKaresi) {
+        // Geri al portalı: 5 harfli kelimede (haritada yoksa yeni bir tane çıkar)
+        if (kelime.length === 5 && !geriAlKaresi) {
             geriAlKaresiOlustur();
         }
-        // Zaman portalı: 6+ harfli kelimede (eğer geri al portalı yoksa)
+        // Zaman portalı: 6+ harfli kelimede (haritada geri al ve zaman portalı yoksa)
         else if (kelime.length >= 6 && !geriAlKaresi && !ekstraSureKaresi) {
             ekstraSureKaresiOlustur();
+        }
+        // x2 portalı: 7+ harfli kelimede (haritada yoksa)
+        if (kelime.length >= 7 && !x2Karesi) {
+            x2KaresiOlustur();
+        }
+        // Level skip portalı: 8+ harfli kelimede (haritada yoksa)
+        if (kelime.length >= 8 && !levelSkipKaresi) {
+            levelSkipKaresiOlustur();
         }
 
         const seviyeBilgisi = SEVIYELER[mevcutSeviye];
@@ -1385,6 +1520,10 @@ function tumunuCiz() {
     cizGeriAlKaresi();
     // Zaman portalı (+30 saniye)
     cizEkstraSureKaresi();
+    // x2 Puan portalı
+    cizX2Karesi();
+    // Seviye atlama portalı
+    cizLevelSkipKaresi();
 
     // Duvar portalları
     duvarKareleriniCiz();
@@ -1522,6 +1661,8 @@ function pozisyonDoluMu(x, y) {
     if (onayKaresi && onayKaresi.x === x && onayKaresi.y === y) return true;
     if (geriAlKaresi && geriAlKaresi.x === x && geriAlKaresi.y === y) return true;
     if (ekstraSureKaresi && ekstraSureKaresi.x === x && ekstraSureKaresi.y === y) return true;
+    if (x2Karesi && x2Karesi.x === x && x2Karesi.y === y) return true;
+    if (levelSkipKaresi && levelSkipKaresi.x === x && levelSkipKaresi.y === y) return true;
     if (duvarKareleri && duvarKareleri.some(d => d.x === x && d.y === y)) return true;
     return false;
 }
@@ -1536,7 +1677,7 @@ function harfiYerineKoyVeyaRastgele(harf, hedefX, hedefY) {
             y = Math.floor(Math.random() * GRID_BOYUTU);
             deneme++;
             if (deneme > 200) break; // güvenlik
-        } while (pozisyonDoluMu(x, y) || (geriAlKaresi && x === geriAlKaresi.x && y === geriAlKaresi.y) || (ekstraSureKaresi && x === ekstraSureKaresi.x && y === ekstraSureKaresi.y));
+        } while (pozisyonDoluMu(x, y) || (geriAlKaresi && x === geriAlKaresi.x && y === geriAlKaresi.y) || (ekstraSureKaresi && x === ekstraSureKaresi.x && y === ekstraSureKaresi.y) || (x2Karesi && x === x2Karesi.x && y === x2Karesi.y) || (levelSkipKaresi && x === levelSkipKaresi.x && y === levelSkipKaresi.y));
     }
     harfler.push({ x, y, harf });
 }
@@ -1571,6 +1712,41 @@ function ekstraSureKaresiOlustur() {
         (ekstraSureKaresi && x === ekstraSureKaresi.x && y === ekstraSureKaresi.y)
     );
     ekstraSureKaresi = { x, y };
+}
+
+function x2KaresiOlustur() {
+    // Boş bir hücre seç ve x2 puan portalı koy
+    let x, y, deneme = 0;
+    do {
+        x = Math.floor(Math.random() * GRID_BOYUTU);
+        y = Math.floor(Math.random() * GRID_BOYUTU);
+        deneme++;
+        if (deneme > 300) break;
+    } while (
+        pozisyonDoluMu(x, y) ||
+        (geriAlKaresi && x === geriAlKaresi.x && y === geriAlKaresi.y) ||
+        (ekstraSureKaresi && x === ekstraSureKaresi.x && y === ekstraSureKaresi.y) ||
+        (x2Karesi && x === x2Karesi.x && y === x2Karesi.y)
+    );
+    x2Karesi = { x, y };
+}
+
+function levelSkipKaresiOlustur() {
+    // Boş bir hücre seç ve seviye atlama portalı koy
+    let x, y, deneme = 0;
+    do {
+        x = Math.floor(Math.random() * GRID_BOYUTU);
+        y = Math.floor(Math.random() * GRID_BOYUTU);
+        deneme++;
+        if (deneme > 300) break;
+    } while (
+        pozisyonDoluMu(x, y) ||
+        (geriAlKaresi && x === geriAlKaresi.x && y === geriAlKaresi.y) ||
+        (ekstraSureKaresi && x === ekstraSureKaresi.x && y === ekstraSureKaresi.y) ||
+        (x2Karesi && x === x2Karesi.x && y === x2Karesi.y) ||
+        (levelSkipKaresi && x === levelSkipKaresi.x && y === levelSkipKaresi.y)
+    );
+    levelSkipKaresi = { x, y };
 }
 
 function geriAlKaresiniKullan() {

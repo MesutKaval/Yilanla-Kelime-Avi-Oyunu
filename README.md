@@ -28,9 +28,13 @@ Oyunda stratejik öneme sahip özel portallar bulunur. İşte ikonları ve göre
 | İkon | Adı | Açıklama |
 | :---: | --- | --- |
 | <img src="assets/portal_icons/merkez.png" width="50"> | **Merkez Portal** | Kelimeyi onaylamak için buraya girin. Oyunun kalbidir. |
-| <img src="assets/portal_icons/geri.png" width="50"> | **Geri Al Portalı** | **5 harfli** bir kelime bulduğunuzda *sadece bir kez* çıkar. Son aldığınız harfi yılanın kuyruğundan siler. |
-| <img src="assets/portal_icons/zaman.png" width="50"> | **Zaman Portalı** | **6 ve üzeri** harfli kelimelerde çıkar. Aldığınızda süreye **+30 saniye** ekler. |
+| <img src="assets/portal_icons/geri.png" width="50"> | **Geri Al Portalı** | **5 harfli** bir kelime bulduğunuzda çıkar. Son aldığınız harfi yılanın kuyruğundan siler. Kullanılınca kaybolur, koşullar sağlandığında tekrar çıkar. |
+| <img src="assets/portal_icons/zaman.png" width="50"> | **Zaman Portalı** | **6+ harfli** kelimelerde çıkar. Aldığınızda süreye **+30 saniye** ekler. Kullanılınca kaybolur, koşullar sağlandığında tekrar çıkar. |
+| <img src="assets/portal_icons/x2.png" width="50"> | **x2 Puan Portalı** | **7+ harfli** kelimelerde çıkar. Bu portala geçerli bir kelimeyle girerseniz **2 katı puan** alırsınız. |
+| <img src="assets/portal_icons/level_skip.png" width="50"> | **Seviye Atlama Portalı** | **8+ harfli** kelimelerde çıkar. Bu portala girdiğinizde (boş bile olsa) **direkt sonraki seviyeye** geçersiniz. |
 | <img src="assets/portal_icons/duvar.png" width="50"> | **Duvar (Ceza) Portalı** | Geçersiz bir kelime onaylarsanız ceza olarak çıkar. Yılan bu duvara çarparsa **OYUN BİTER**. |
+
+> **Not:** Geri Al, Zaman, x2 ve Seviye Atlama portalları haritada aynı anda yalnızca birer tane bulunabilir. Kullanılmayan portallar bir sonraki seviyeye taşınır.
 
 ## 🚀 Çalıştırma seçenekleri
 
