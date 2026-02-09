@@ -1,3 +1,0 @@
-1. seviye atla ve x2 portalları eklenecek ve gerekli portallara gerekli ikonlar eklenecek
-2. şapkalı a harfi dahil olacak şekilde düzenleme yapılacak
-3. seviye kayıt/devam
