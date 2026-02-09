@@ -496,6 +496,11 @@ async function kelimeListesiniYukle() {
             if (kelime && kelime.length >= 4) { // En az 4 harfli kelimeler
                 const kelimeBuyuk = kelime.toLocaleUpperCase('tr-TR');
                 kelimeListesi.add(kelimeBuyuk);
+                // Şapkalı harfleri de şapkasız olarak ekle (â→a, î→i, û→u)
+                const sapkasiz = kelimeBuyuk.replace(/Â/g, 'A').replace(/Î/g, 'İ').replace(/Û/g, 'U');
+                if (sapkasiz !== kelimeBuyuk) {
+                    kelimeListesi.add(sapkasiz);
+                }
             }
         });
 
