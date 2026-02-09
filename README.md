@@ -56,4 +56,4 @@ Hiçbir şey indirmeden oynamak için şu linke tıklayın:
 
 ## 📄 Lisans
 
-Bu uygulama **Mesut Kaval** tarafından yapay zeka kullanılarak oluşturulmuştur. Açık kaynak kodludur ve özgürce kullanılabilir.
+Bu oyun **Mesut Kaval** tarafından tasarlanmış olup, kodlama sürecinde yapay zeka araçlarından yararlanılmıştır. Açık kaynak kodludur ve özgürce kullanılabilir.
